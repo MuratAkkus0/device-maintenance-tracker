@@ -292,7 +292,6 @@ app.get("/", (req, res) => {
 });
 
 app.post("/send_mail", (req, res) => {
-  console.log("Somebody just hit me");
   console.log(req.body);
   sendEmail(req.body)
     .then((response) => res.send(response.message))
