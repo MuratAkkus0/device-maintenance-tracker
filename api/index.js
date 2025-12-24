@@ -270,8 +270,8 @@ async function sendEmail({
       secure: false,
       service: "gmail",
       auth: {
-        user: "akkusmurat123@gmail.com",
-        pass: "cydjetpvxklxtcmp",
+        user: "mail@gmail.com",
+        pass: "REDACTED_ROTATE_AND_USE_ENV_VAR",
       },
     });
 
