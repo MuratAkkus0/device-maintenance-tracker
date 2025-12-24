@@ -1,6 +1,6 @@
 # IT Device Maintenance Tracking Dashboard
 
-This project is an **IT device maintenance tracking dashboard** built with **TypeScript** and **React**.  
+This project is an **IT device maintenance tracking dashboard** built with **React**.  
 It uses **Nodemailer** to send emails via a simple **API endpoint**.
 
 ## Educational Purpose
