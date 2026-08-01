@@ -9,6 +9,7 @@
     "dev": "node --watch --env-file=.env ./src/server.js",
     "start": "node ./src/server.js",
     "seed": "node --env-file=.env prisma/seed.js",
+    "build": "echo \"@wartungstermine/api: nothing to build (plain Node/ESM)\"",
     "test": "vitest run",
     "lint": "eslint ."
   },
