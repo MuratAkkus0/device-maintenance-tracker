@@ -1,0 +1,158 @@
+// Prisma schema for the Wartungstermine (IT maintenance tracker) API.
+// See https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  TECHNICIAN
+}
+
+enum DeviceType {
+  LAPTOP
+  DESKTOP
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(TECHNICIAN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  refreshTokens      RefreshToken[]
+  assignedDevices    Device[]            @relation("DeviceTechnician")
+  maintenanceRecords MaintenanceRecord[] @relation("MaintenancePerformedBy")
+
+  @@map("users")
+}
+
+// Rotatable, revocable refresh tokens. Only the SHA-256 hash is stored so a
+// leaked database dump cannot be replayed as a valid refresh token.
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Room {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  devices Device[]
+
+  @@map("rooms")
+}
+
+// Staff members who can own laptops ("Gerätebesitzer"). Distinct from `User`:
+// staff do not log in, they are just an owner reference on a device.
+model Staff {
+  id         Int      @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  department String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  devices Device[]
+
+  @@map("staff")
+}
+
+model Device {
+  id                        Int        @id @default(autoincrement())
+  // No stored `name`/label column on purpose: the old app derived it from
+  // type + id (e.g. "Laptop-42") at write time and had to keep it in sync
+  // by hand. It is a pure function of type + id, so the API computes it in
+  // the response DTO (devices.service.js#toDeviceDto) instead of storing
+  // and risking drift.
+  type                      DeviceType
+  macAddress                String?
+  purchaseDate              DateTime
+  maintenanceIntervalMonths Int
+  lastServiceDate           DateTime
+  // Denormalized, server-computed field kept in sync by the maintenance
+  // service whenever lastServiceDate/maintenanceIntervalMonths change or a
+  // maintenance record is logged. Storing it (instead of computing it only
+  // at read time) is what makes the due/overdue list a plain indexed
+  // `WHERE nextDueDate <= ...` query instead of client-side filtering.
+  nextDueDate               DateTime
+
+  ownerStaffId Int?
+  owner        Staff? @relation(fields: [ownerStaffId], references: [id], onDelete: Restrict)
+
+  roomId Int?
+  room   Room? @relation(fields: [roomId], references: [id], onDelete: Restrict)
+
+  technicianId Int
+  technician   User @relation("DeviceTechnician", fields: [technicianId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  maintenanceRecords MaintenanceRecord[]
+  notificationLogs   NotificationLog[]
+
+  @@index([nextDueDate])
+  @@index([ownerStaffId])
+  @@index([roomId])
+  @@map("devices")
+}
+
+// Append-only maintenance history. A completed service creates a new row
+// here; it is never overwritten, unlike the old single `lastCareDate` field.
+model MaintenanceRecord {
+  id            Int      @id @default(autoincrement())
+  deviceId      Int
+  device        Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  performedAt   DateTime
+  performedById Int?
+  performedBy   User?    @relation("MaintenancePerformedBy", fields: [performedById], references: [id], onDelete: SetNull)
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  @@index([deviceId])
+  @@map("maintenance_records")
+}
+
+// One row per (device, calendar day) reminder attempt. The unique
+// constraint is the idempotency guard the notification job relies on: two
+// overlapping/duplicate job runs on the same day race to insert the same
+// row, the loser gets a unique-constraint violation and skips sending.
+model NotificationLog {
+  id               Int                @id @default(autoincrement())
+  deviceId         Int
+  device           Device             @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  notificationDate DateTime
+  status           NotificationStatus @default(PENDING)
+  error            String?
+  sentAt           DateTime?
+  createdAt        DateTime           @default(now())
+
+  @@unique([deviceId, notificationDate])
+  @@map("notification_logs")
+}
