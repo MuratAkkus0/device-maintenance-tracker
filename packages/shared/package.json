@@ -1,0 +1,24 @@
+{
+  "name": "@wartungstermine/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Zod schemas, constants and pure helpers shared between apps/api and apps/web.",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "eslint": "^9.13.0",
+    "globals": "^15.11.0",
+    "vitest": "^3.2.4"
+  }
+}
