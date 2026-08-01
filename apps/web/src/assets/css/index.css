@@ -1,113 +1,30 @@
 @import "./reset.css";
 @import "./Fonts.css";
+@import "./tokens.css";
+@import "./layout.css";
 @import "./navbar.css";
-@import "./ItemCard.css";
+@import "./buttons.css";
+@import "./forms.css";
+@import "./status-badge.css";
+@import "./device-card.css";
+@import "./modal.css";
+@import "./list-table.css";
+@import "./state.css";
+@import "./auth.css";
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-:root {
-  --main-color-one: black;
-  --main-color-two: #cf5c36;
-  --main-color-three: #ffffff;
-  --main-border-color: rgb(190, 190, 190);
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
 }
 
 html,
-body {
-  width: 100%;
-  height: 100vh;
-}
-
+body,
 #root {
   width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  grid-template-rows: repeat(10, 1fr);
-  justify-content: center;
+  min-height: 100%;
 }
 
-/* For All View Containers */
-.view__container {
-  width: 100%;
-  display: flex;
-  grid-column: 3/11;
-  grid-row: 1/11;
-  padding: 2rem;
-  overflow-y: auto;
-  position: relative;
-  flex-direction: column;
-}
-
-/* Dashboard View Container */
-.app__overview--container {
-  gap: 1rem;
-}
-
-/* Add Forms Container */
-.add__form--container {
-  width: 95%;
-  height: fit-content;
-  border: 1px solid var(--main-border-color);
-  padding: 1rem;
-  border-radius: 0.5rem;
-  transition: 0.3s all;
-}
-
-.width95 {
-  width: 95%;
-}
-.mt1rem {
-  margin-top: 1rem;
-}
-.show__more--btn {
-  height: fit-content;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-}
-
-.btn {
-  display: block;
-  cursor: pointer;
-  width: 8rem;
-  background-color: var(--main-color-two);
-  border-radius: 5px;
-  font-size: 1rem;
-  text-align: center;
-  padding: 0.5rem 1rem;
-  color: var(--main-color-three);
-}
-.btn:active {
-  transform: scale(0.98);
-}
-.a__link:active,
-.a__link:visited,
-.a__link {
-  display: block;
-  color: var(--main-color-three);
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-}
-.no-item {
-  color: #aaa;
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-/* Delete icon */
-.del__icon {
-  cursor: pointer;
-  color: var(--main-color-two);
-  font-size: 1.7rem;
-  transition: 0.3s all;
-}
-
-.del__icon:hover {
-  transform: scale(1.1);
+body {
+  min-height: 100vh;
 }

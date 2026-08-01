@@ -1,31 +1,42 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
+
+const NAV_LINKS = [
+  { to: "/", label: "Dashboard", end: true },
+  { to: "/devices", label: "Devices" },
+  { to: "/staff", label: "Staff" },
+  { to: "/rooms", label: "Rooms" },
+];
+
 function Navbar() {
+  const { user, logout } = useAuth();
+
   return (
-    <>
-      <menu>
-        <div className="app__logo">Wartungstermine Verwalten</div>
-        <li className="menu__item">
-          <Link className="a__link" to={"/"}>
-            Dashboard
-          </Link>
-        </li>
-        <li className="menu__item">
-          <Link className="a__link" to={"/add-item"}>
-            Add New Device
-          </Link>
-        </li>
-        <li className="menu__item">
-          <Link className="a__link" to={"/add-personal"}>
-            Add New Personal
-          </Link>
-        </li>
-        <li className="menu__item">
-          <Link className="a__link" to={"/add-room"}>
-            Add New Room
-          </Link>
-        </li>
-      </menu>
-    </>
+    <nav className="app-nav" aria-label="Main navigation">
+      <div className="app-nav__brand">Wartungstermine</div>
+      <ul className="app-nav__links">
+        {NAV_LINKS.map((link) => (
+          <li key={link.to}>
+            <NavLink
+              to={link.to}
+              end={link.end}
+              className={({ isActive }) => `app-nav__link${isActive ? " is-active" : ""}`}
+            >
+              {link.label}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+      <div className="app-nav__footer">
+        <div className="app-nav__user">
+          <span className="app-nav__user-name">{user?.name}</span>
+          <span className="app-nav__user-role">{user?.role?.toLowerCase()}</span>
+        </div>
+        <button type="button" className="app-nav__logout" onClick={logout}>
+          Log out
+        </button>
+      </div>
+    </nav>
   );
 }
 

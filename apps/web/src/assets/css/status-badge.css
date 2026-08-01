@@ -1,0 +1,38 @@
+/*
+ * Maintenance status is never conveyed by color alone: each status pairs a
+ * distinct icon shape with a text label, and the badge exposes its meaning
+ * to assistive tech via a plain-text label (not just color/aria-hidden icon).
+ */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.2rem var(--space-2);
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.status-badge svg {
+  flex-shrink: 0;
+}
+
+.status-badge--overdue {
+  color: var(--status-overdue-text);
+  background-color: var(--status-overdue-bg);
+  border-color: var(--status-overdue-border);
+}
+
+.status-badge--due-soon {
+  color: var(--status-due-soon-text);
+  background-color: var(--status-due-soon-bg);
+  border-color: var(--status-due-soon-border);
+}
+
+.status-badge--ok {
+  color: var(--status-ok-text);
+  background-color: var(--status-ok-bg);
+  border-color: var(--status-ok-border);
+}

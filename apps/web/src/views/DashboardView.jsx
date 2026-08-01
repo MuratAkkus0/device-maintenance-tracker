@@ -1,93 +1,91 @@
-import Navbar from "../components/Navbar";
-import AllItems from "../components/AllItems";
-import TimePressedItems from "../components/TimePressedItems";
-import { useEffect, useState } from "react";
-import ItemPopup from "../components/ItemPopup";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
+import { useDeviceList } from "../hooks/useDeviceList";
+import { useDeviceInteractions } from "../hooks/useDeviceInteractions";
+import DeviceList from "../components/DeviceList";
+import DeviceDetailModal from "../components/DeviceDetailModal";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 function DashboardView() {
-  const [showPopup, setShowPopup] = useState(false);
-  const [currentItem, setCurrentItem] = useState({});
-  const [deviceList, setDeviceList] = useState(
-    JSON.parse(localStorage.getItem("devices")) ?? []
-  );
-  const [personalList, setPersonalList] = useState(
-    JSON.parse(localStorage.getItem("personalList")) ?? []
-  );
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
 
-  const [roomList, setRoomList] = useState(
-    JSON.parse(localStorage.getItem("roomList")) ?? []
-  );
-  const [timePressedDevices, setTimePressedDevices] = useState([]);
+  const dueList = useDeviceList({ status: "due", pageSize: 100 });
+  const allList = useDeviceList({ pageSize: 100 });
 
-  useEffect(() => {
-    console.log("active");
-    setTimePressedDevices(
-      deviceList &&
-        deviceList.filter((item) => {
-          let dateDiff = new Date(
-            new Date() - new Date(item.lastCareDate)
-          ).getMonth();
-          if (
-            (dateDiff == 0 || dateDiff >= item.carePeriod) &&
-            item.carePeriod - dateDiff <= 2
-          ) {
-            return item;
-          }
-        })
-    );
-    localStorage.setItem("devices", JSON.stringify(deviceList));
-  }, [deviceList]);
-
-  const onClickItem = (e) => {
-    e.stopPropagation();
-    let id = e.target.closest(".item__card--container").dataset.id;
-    let item = deviceList.filter((i) => i.id == id)[0];
-    setCurrentItem(item);
-    setShowPopup(true);
-  };
-  const onClosePopup = (e) => {
-    e.stopPropagation();
-    console.log(e.target);
-    localStorage.setItem("isEditActive", false);
-    setShowPopup(false);
-  };
+  const {
+    selectedDevice,
+    setSelectedDevice,
+    deviceToDelete,
+    setDeviceToDelete,
+    isDeleting,
+    sendingReminderId,
+    syncDevice,
+    handleSendReminder,
+    handleConfirmDelete,
+  } = useDeviceInteractions([dueList, allList]);
 
   return (
     <>
-      <Navbar />
-      <div className="app__overview--container view__container">
-        {showPopup ? (
-          <>
-            <ItemPopup
-              item={currentItem ?? {}}
-              personalList={personalList}
-              roomList={roomList}
-              onClosePopup={onClosePopup}
-              deviceList={deviceList}
-              setDeviceList={setDeviceList}
-            />
-          </>
-        ) : (
-          ""
-        )}
-        <TimePressedItems
-          onClickItem={onClickItem}
-          personalList={personalList}
-          roomList={roomList}
-          deviceList={timePressedDevices}
-          allDevicesList={deviceList}
+      <div className="page-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Overview of every tracked device and what needs attention.</p>
+        </div>
+      </div>
+
+      <div className="dashboard-sections">
+        <DeviceList
+          title="Needs attention"
+          devices={dueList.devices}
+          isLoading={dueList.isLoading}
+          error={dueList.error}
+          onRetry={dueList.refetch}
+          emptyMessage="Nothing is due or overdue. Everything is on schedule."
           limit={3}
-          setDeviceList={setDeviceList}
+          isAdmin={isAdmin}
+          onSelectDevice={setSelectedDevice}
+          onDeleteDevice={setDeviceToDelete}
+          onSendReminder={handleSendReminder}
+          sendingReminderId={sendingReminderId}
         />
-        <AllItems
-          onClickItem={onClickItem}
-          personalList={personalList}
-          roomList={roomList}
-          deviceList={deviceList}
-          limit={3}
-          setDeviceList={setDeviceList}
+
+        <DeviceList
+          title="All devices"
+          devices={allList.devices}
+          isLoading={allList.isLoading}
+          error={allList.error}
+          onRetry={allList.refetch}
+          emptyMessage="No devices have been added yet."
+          limit={6}
+          isAdmin={isAdmin}
+          onSelectDevice={setSelectedDevice}
+          onDeleteDevice={setDeviceToDelete}
+          onSendReminder={handleSendReminder}
+          sendingReminderId={sendingReminderId}
         />
       </div>
+
+      {selectedDevice && (
+        <DeviceDetailModal
+          device={selectedDevice}
+          isAdmin={isAdmin}
+          onClose={() => setSelectedDevice(null)}
+          onEdit={(device) => navigate(`/devices/${device.id}/edit`)}
+          onDeleteRequest={setDeviceToDelete}
+          onDeviceUpdated={syncDevice}
+        />
+      )}
+
+      <ConfirmDialog
+        open={Boolean(deviceToDelete)}
+        title="Delete device"
+        description={deviceToDelete ? `Delete ${deviceToDelete.name}? This cannot be undone.` : ""}
+        confirmLabel="Delete"
+        isBusy={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeviceToDelete(null)}
+      />
     </>
   );
 }

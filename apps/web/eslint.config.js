@@ -29,6 +29,12 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
+      // This project is plain JS (no TypeScript, no prop-types package) and
+      // is not going to adopt PropTypes as a second, redundant type system;
+      // API request/response shapes are already validated by the shared
+      // zod schemas (see @wartungstermine/shared) and the API's own
+      // validation middleware. Disabled deliberately, not to silence a bug.
+      'react/prop-types': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
