@@ -42,10 +42,13 @@ export function useDeviceInteractions(lists) {
       removeDeviceEverywhere(deviceToDelete.id);
       toast.success("Device deleted successfully.");
       setSelectedDevice((current) => (current?.id === deviceToDelete.id ? null : current));
-      setDeviceToDelete(null);
     } catch (error) {
       toast.error(getErrorMessage(error, "Could not delete this device."));
     } finally {
+      // Always dismiss the confirmation dialog - on success the card is
+      // gone, on failure the toast already explains why, so leaving the
+      // modal stuck open (blocking the rest of the page) serves no one.
+      setDeviceToDelete(null);
       setIsDeleting(false);
     }
   }

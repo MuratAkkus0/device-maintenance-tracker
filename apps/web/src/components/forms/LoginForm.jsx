@@ -39,6 +39,7 @@ function LoginForm({ onSubmit, isSubmitting, submitError }) {
         value={form.email}
         onChange={(e) => update("email", e.target.value)}
         required
+        autoComplete="email"
         error={fieldErrors.email}
       />
       <TextField
@@ -48,6 +49,7 @@ function LoginForm({ onSubmit, isSubmitting, submitError }) {
         value={form.password}
         onChange={(e) => update("password", e.target.value)}
         required
+        autoComplete="current-password"
         error={fieldErrors.password}
       />
       {submitError && (

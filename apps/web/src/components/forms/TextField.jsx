@@ -10,6 +10,7 @@ function TextField({
   error,
   placeholder,
   max,
+  autoComplete,
   className = "form-field",
 }) {
   const errorId = error ? `${id}-error` : undefined;
@@ -31,6 +32,7 @@ function TextField({
         disabled={disabled}
         placeholder={placeholder}
         max={max}
+        autoComplete={autoComplete}
         aria-invalid={Boolean(error)}
         aria-describedby={[hintId, errorId].filter(Boolean).join(" ") || undefined}
       />

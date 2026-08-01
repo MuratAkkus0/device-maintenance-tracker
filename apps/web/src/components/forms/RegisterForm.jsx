@@ -38,6 +38,7 @@ function RegisterForm({ onSubmit, isSubmitting, submitError }) {
         value={form.name}
         onChange={(e) => update("name", e.target.value)}
         required
+        autoComplete="name"
         error={fieldErrors.name}
       />
       <TextField
@@ -47,6 +48,7 @@ function RegisterForm({ onSubmit, isSubmitting, submitError }) {
         value={form.email}
         onChange={(e) => update("email", e.target.value)}
         required
+        autoComplete="email"
         error={fieldErrors.email}
       />
       <TextField
@@ -56,6 +58,7 @@ function RegisterForm({ onSubmit, isSubmitting, submitError }) {
         value={form.password}
         onChange={(e) => update("password", e.target.value)}
         required
+        autoComplete="new-password"
         hint="At least 8 characters."
         error={fieldErrors.password}
       />

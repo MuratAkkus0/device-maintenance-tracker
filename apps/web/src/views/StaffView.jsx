@@ -55,13 +55,16 @@ function StaffView() {
       await staffApi.deleteStaff(staffToDelete.id);
       setStaff((prev) => prev.filter((s) => s.id !== staffToDelete.id));
       toast.success("Staff member deleted successfully.");
-      setStaffToDelete(null);
     } catch (err) {
       // A staff member who still owns a device returns 409 - surfaced as a
       // clean, actionable message instead of the old dangling-reference
       // white screen.
       toast.error(getErrorMessage(err, "Could not delete this staff member."));
     } finally {
+      // Always dismiss the confirmation dialog - on success the row is
+      // gone, on failure the toast already explains why, so leaving the
+      // modal stuck open (blocking the rest of the page) serves no one.
+      setStaffToDelete(null);
       setIsDeleting(false);
     }
   }

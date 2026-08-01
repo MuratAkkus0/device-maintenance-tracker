@@ -45,7 +45,6 @@
   flex-direction: column;
   gap: var(--space-2);
   transition: box-shadow 0.15s ease, transform 0.1s ease;
-  position: relative;
 }
 
 .device-card:hover {
@@ -66,9 +65,12 @@
 
 .device-card__top {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
   gap: var(--space-2);
+}
+
+.device-card__top .status-badge {
+  margin-left: auto;
 }
 
 .device-card__icon {
@@ -102,7 +104,5 @@
 }
 
 .device-card__delete {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
+  flex-shrink: 0;
 }

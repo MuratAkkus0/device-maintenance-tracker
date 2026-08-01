@@ -55,12 +55,15 @@ function RoomsView() {
       await roomsApi.deleteRoom(roomToDelete.id);
       setRooms((prev) => prev.filter((r) => r.id !== roomToDelete.id));
       toast.success("Room deleted successfully.");
-      setRoomToDelete(null);
     } catch (err) {
       // A room that still holds devices returns 409 - surfaced as a clean,
       // actionable message instead of a dashboard crash.
       toast.error(getErrorMessage(err, "Could not delete this room."));
     } finally {
+      // Always dismiss the confirmation dialog - on success the row is
+      // gone, on failure the toast already explains why, so leaving the
+      // modal stuck open (blocking the rest of the page) serves no one.
+      setRoomToDelete(null);
       setIsDeleting(false);
     }
   }

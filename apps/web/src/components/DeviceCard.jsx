@@ -15,19 +15,24 @@ function DeviceCard({ device, isAdmin, onSelect, onDelete, onSendReminder, isSen
 
   return (
     <div className="device-card" role="listitem">
-      {isAdmin && (
-        <button
-          type="button"
-          className="icon-btn device-card__delete"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(device);
-          }}
-          aria-label={`Delete ${device.name}`}
-        >
-          <MdDeleteForever aria-hidden="true" size={22} />
-        </button>
-      )}
+      <div className="device-card__top">
+        {isLaptop ? (
+          <GiLaptop className="device-card__icon" aria-hidden="true" />
+        ) : (
+          <FaComputer className="device-card__icon" aria-hidden="true" />
+        )}
+        <StatusBadge status={device.maintenanceStatus} />
+        {isAdmin && (
+          <button
+            type="button"
+            className="icon-btn device-card__delete"
+            onClick={() => onDelete(device)}
+            aria-label={`Delete ${device.name}`}
+          >
+            <MdDeleteForever aria-hidden="true" size={22} />
+          </button>
+        )}
+      </div>
 
       <button
         type="button"
@@ -35,15 +40,6 @@ function DeviceCard({ device, isAdmin, onSelect, onDelete, onSendReminder, isSen
         onClick={() => onSelect(device)}
         aria-label={`View details for ${device.name}`}
       >
-        <div className="device-card__top">
-          {isLaptop ? (
-            <GiLaptop className="device-card__icon" aria-hidden="true" />
-          ) : (
-            <FaComputer className="device-card__icon" aria-hidden="true" />
-          )}
-          <StatusBadge status={device.maintenanceStatus} />
-        </div>
-
         <div className="device-card__title">{device.name}</div>
 
         <div className="device-card__meta">
@@ -59,10 +55,7 @@ function DeviceCard({ device, isAdmin, onSelect, onDelete, onSendReminder, isSen
         <button
           type="button"
           className="btn btn-secondary btn-sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSendReminder(device);
-          }}
+          onClick={() => onSendReminder(device)}
           disabled={isSendingReminder}
         >
           <MdOutlineMailOutline aria-hidden="true" />
